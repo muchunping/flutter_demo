@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:src="@drawable/splash_screen_00"
+        android:scaleType="fitXY"
+        android:layout_height="match_parent"
+        android:contentDescription="@null" />
+
+    <TextView
+        android:id="@+id/skipView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:layout_marginTop="32dp"
+        android:textColor="@android:color/black"
+        android:layout_marginEnd="16dp"
+        android:layout_marginRight="16dp"
+        android:background="#60999999"
+        android:clickable="true"
+        android:focusable="true"
+        android:padding="8dp"
+        android:text="跳过 3" />
+
+</FrameLayout>
