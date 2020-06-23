@@ -8,6 +8,7 @@ import 'demo/hero_animation.dart';
 import 'demo/line_chart.dart';
 import 'demo/platform_communicate.dart';
 import 'demo/route_animation.dart';
+import 'demo/spring_ball.dart';
 import 'demo/todo_drawer.dart';
 import 'demo/xml_parser.dart';
 
@@ -23,6 +24,7 @@ var routes = {
   "platform_communicate": (c) => new PlatformCommunicateDemo(),
   "app_bill": (c) => new BillApp(),
   "jump_ball": (c) => new JumperApp(),
+  "spring_ball": (c) => new SpringBallApp(),
 };
 
 //全局唯一实例，防止下次进入页面重复创建
