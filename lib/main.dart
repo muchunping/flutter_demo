@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutterdemo/demo/jumper.dart';
 import 'demo/app_bill.dart';
 import 'demo/change_notifier.dart';
+import 'demo/decoration_custom.dart';
 import 'demo/guillotine_menu.dart';
 import 'demo/hero_animation.dart';
 import 'demo/line_chart.dart';
@@ -25,6 +26,7 @@ var routes = {
   "app_bill": (c) => new BillApp(),
   "jump_ball": (c) => new JumperApp(),
   "spring_ball": (c) => new SpringBallApp(),
+  "decoration_custom": (c) => new DecorationApp(),
 };
 
 //全局唯一实例，防止下次进入页面重复创建
