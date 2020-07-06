@@ -41,7 +41,7 @@ class Pretender {
   int intensity;
   final int star;
 
-  Pretender(this.name, this.star, {this.intensity})
+  Pretender(this.name, this.star, {this.intensity = 1})
       : assert(name.length > 1 && name.length < 5);
 }
 

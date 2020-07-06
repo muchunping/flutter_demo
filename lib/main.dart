@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutterdemo/demo/jumper.dart';
 import 'demo/app_bill.dart';
 import 'demo/change_notifier.dart';
 import 'demo/decoration_custom.dart';
+import 'demo/flight_ball.dart';
 import 'demo/guillotine_menu.dart';
 import 'demo/hero_animation.dart';
+import 'demo/jumper.dart';
 import 'demo/line_chart.dart';
 import 'demo/platform_communicate.dart';
+import 'demo/refresh_indicator.dart';
 import 'demo/route_animation.dart';
 import 'demo/spring_ball.dart';
 import 'demo/todo_drawer.dart';
@@ -27,6 +29,8 @@ var routes = {
   "jump_ball": (c) => new JumperApp(),
   "spring_ball": (c) => new SpringBallApp(),
   "decoration_custom": (c) => new DecorationApp(),
+  "refresh_indicator": (c) => new RefreshIndicatorDemo(),
+  "flight_ball": (c) => new FightBallApp(),
 };
 
 //全局唯一实例，防止下次进入页面重复创建

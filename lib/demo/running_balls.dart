@@ -1,3 +1,5 @@
+const double maxTime = 3000.0;
+
 main() {
   var ballArray = [
     Ball(124),
@@ -26,7 +28,7 @@ main() {
         if(e.time <=0) e.time += e.ball.duration;
       });
       nextBall.action();
-      if (time > 3000) {
+      if (time > maxTime) {
         print("over time!");
         return;
       }
