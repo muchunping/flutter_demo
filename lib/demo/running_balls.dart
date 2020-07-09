@@ -83,7 +83,7 @@ class Playground {
     int count = 0;
     assert(topArray.isNotEmpty && bottomArray.isNotEmpty);
     for (;;) {
-      await new Future.delayed(const Duration(milliseconds: 1000));
+      await new Future.delayed(const Duration(milliseconds: 3000));
       print("----- ${count++} -----");
       RunningBall nextBall;
       var allArray = topArray.followedBy(bottomArray);
@@ -97,7 +97,9 @@ class Playground {
         e.time -= deltaTime;
         if (e.time <= 0) e.time += e.ball.duration;
       });
-      nextBall.play();
+      var enemy = (nextBall.isIntruder ? topArray : bottomArray)
+          .firstWhere((e) => true);
+      nextBall.play(enemy);
       if (time > maxTime) {
         print("over time!");
         return;
@@ -221,7 +223,8 @@ class _ArrayWidgetState extends State<ArrayWidget> {
   }
 }
 
-typedef PlayNotify = void Function(int m);
+typedef PlayNotify = void Function(Rect m);
+typedef GlobalRect = Rect Function();
 
 class RunningBall {
   final Ball ball;
@@ -229,11 +232,12 @@ class RunningBall {
   ArraySlotPosition position;
   double time;
   PlayNotify notify;
+  GlobalRect rect;
 
   RunningBall(this.ball, this.isIntruder) : time = ball.duration;
 
-  void play() {
-    notify?.call(0);
+  void play(RunningBall enemy) {
+    notify?.call(enemy.rect?.call());
     print("$this action");
   }
 
@@ -325,14 +329,29 @@ class _BallWidgetState extends State<BallWidget>
     super.initState();
     _positionController =
         AnimationController(vsync: this, duration: Duration(milliseconds: 200));
-    int direction = widget.ball.isIntruder ? -1 : 1;
-    _positionFactor = _positionController.drive(
-        Tween(begin: Offset(0, 0), end: Offset(0, 0.3 * direction))
-            .chain(CurveTween(curve: Curves.easeInQuart)));
     widget.ball.notify = play;
+    widget.ball.rect = (){
+      var box = context.findRenderObject() as RenderBox;
+      Offset offset = box.localToGlobal(Offset.zero);
+      print("${widget.ball.ball} offset = $offset");
+      return box.paintBounds.translate(offset.dx, offset.dy);
+    };
   }
 
-  void play(int i) {
+  void play(Rect target) {
+    var box = context.findRenderObject() as RenderBox;
+    Offset o = box.localToGlobal(Offset.zero);
+    var local = box.paintBounds.translate(o.dx, o.dy);
+    print("local= $local");
+    print("target= $target");
+    var offset = local.center - target.center;
+    print("offset= $offset");
+    var end = Offset(-offset.dx / local.width, -offset.dy / local.height);
+    print("end= $end");
+    _positionFactor = _positionController.drive(
+        Tween(begin: Offset(0, 0), end: end)
+            .chain(CurveTween(curve: Curves.easeInQuart)));
+    setState(() {});
     _positionController
         .animateTo(1.5)
         .whenComplete(() => _positionController.animateTo(0.0));
@@ -340,16 +359,19 @@ class _BallWidgetState extends State<BallWidget>
 
   @override
   Widget build(BuildContext context) {
-    return SlideTransition(
-      position: _positionFactor,
-      child: Container(
-        width: 64,
-        height: 64,
-        decoration: BoxDecoration(
-            borderRadius: BorderRadius.all(Radius.circular(18.0))),
-        alignment: Alignment.center,
-        child: Text(widget.ball.ball.duration.toString()),
-      ),
+    var container = Container(
+      width: 64,
+      height: 64,
+      decoration:
+          BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(18.0))),
+      alignment: Alignment.center,
+      child: Text(widget.ball.ball.duration.toString()),
     );
+    return _positionFactor != null
+        ? SlideTransition(
+            position: _positionFactor,
+            child: container,
+          )
+        : container;
   }
 }
