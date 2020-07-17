@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'demo/app_bill.dart';
 import 'demo/change_notifier.dart';
+import 'demo/conway_life.dart';
 import 'demo/decoration_custom.dart';
 import 'demo/flight_ball.dart';
 import 'demo/guillotine_menu.dart';
@@ -33,6 +34,7 @@ var routes = {
   "refresh_indicator": (c) => new RefreshIndicatorDemo(),
   "flight_ball": (c) => new FightBallApp(),
   "running_balls": (c) => new RunningBallApp(),
+  "conway_life": (c) => new ConwayLifeApp(),
 };
 
 //全局唯一实例，防止下次进入页面重复创建
