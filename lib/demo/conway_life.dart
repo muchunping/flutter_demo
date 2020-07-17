@@ -7,18 +7,113 @@ class ConwayLifeApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: Center(child: LimitlessGridWidget()),
+        child: ConwayLifeWidget(),
       ),
     );
   }
 }
 
-//class Life {
-//  bool isAlive;
-//  final Coord coord;
-//
-//  Life(this.coord);
-//}
+class ConwayLifeWidget extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    Chessboard chessboard = Chessboard();
+    return Stack(
+      children: <Widget>[
+        Align(child: LimitlessGridWidget(chessboard)),
+        Align(alignment: Alignment.topCenter, child: ConsoleWidget(chessboard))
+      ],
+    );
+  }
+}
+
+class ConsoleWidget extends StatefulWidget {
+  final GameController controller;
+  final Logcat logcat;
+
+  ConsoleWidget(chessboard)
+      : controller = chessboard,
+        logcat = chessboard;
+
+  @override
+  _ConsoleWidgetState createState() => _ConsoleWidgetState();
+}
+
+class _ConsoleWidgetState extends State<ConsoleWidget> {
+  String log;
+
+  @override
+  void initState() {
+    super.initState();
+    widget.logcat.printer = (log) {
+      setState(() {
+        this.log = log;
+      });
+    };
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Row(
+        children: <Widget>[
+          Flexible(
+            child: Text(log ?? "游戏尚未开始，请点击开始按钮"),
+            fit: FlexFit.tight,
+          ),
+          RaisedButton(
+            onPressed: () => widget.controller.runningState != 2
+                ? widget.controller.play()
+                : widget.controller.pause(),
+            child: Text("开始/暂停"),
+          )
+        ],
+      ),
+    );
+  }
+}
+
+typedef Printer = void Function(String message);
+
+mixin Logcat {
+  Printer printer;
+
+  void printLog(String message) {
+    if (printer != null)
+      printer?.call(message);
+    else
+      print(message);
+  }
+}
+
+mixin GameController {
+  /// 运行状态：0表示初始状态，1表示准备就绪，2表示运行中，3表示暂停，4表示已结束
+  int runningState = 0;
+
+  void prepare() {
+    runningState = 1;
+  }
+
+  void play() {
+    if (runningState == 2) return;
+    runningState = 2;
+    _play();
+  }
+
+  void pause() {
+    if (runningState == 3) return;
+    runningState = 3;
+    _pause();
+  }
+
+  void over() {
+    runningState = 4;
+  }
+
+  void _play() {}
+
+  void _pause() {}
+}
 
 class Coord {
   final int x;
@@ -48,10 +143,12 @@ class Coord {
 
 typedef DrawNotify = void Function();
 
-class Chessboard {
+class Chessboard with GameController, Logcat {
   List<Coord> lifeList = List<Coord>();
   double scaleFactor = 1.0;
   double gridSize = 20;
+  /// 迭代次数
+  int count = 0;
   DrawNotify notify;
 
   void init() {
@@ -63,16 +160,22 @@ class Chessboard {
   }
 
   void addLife(Coord coord) {
-    lifeList.add(coord);
+    if (lifeList.contains(coord)) {
+      lifeList.remove(coord);
+    } else {
+      lifeList.add(coord);
+    }
     notify?.call();
   }
 
-  void play() async {
-    int count = 0;
+  void _play() async {
+    super.play();
+    print("你开始了游戏");
     for (;;) {
       await new Future.delayed(const Duration(milliseconds: 1000));
+      if (runningState != 2) return;
       List<Coord> lifeList = this.lifeList;
-      print("Chessboard#play(第 ${count ++} 代存活细胞数量为 ${lifeList.length})");
+      printLog("第 ${count++} 代存活细胞数量为 ${lifeList.length}");
       var influencedList = Set<Coord>();
       lifeList.forEach((e) {
         influencedList.addAll(e.neighbor);
@@ -90,11 +193,31 @@ class Chessboard {
       });
       this.lifeList = newLifeList;
       notify?.call();
+      if(lifeList.length == 0){
+        over();
+        return;
+      }
     }
+  }
+
+  @override
+  void _pause() {
+    super._pause();
+    print("你暂停了游戏");
+  }
+
+  @override
+  void over() {
+    super.over();
+    printLog("游戏已结束");
   }
 }
 
 class LimitlessGridWidget extends StatefulWidget {
+  final Chessboard chessboard;
+
+  LimitlessGridWidget(this.chessboard);
+
   @override
   _LimitlessGridWidgetState createState() => _LimitlessGridWidgetState();
 }
@@ -107,11 +230,11 @@ class _LimitlessGridWidgetState extends State<LimitlessGridWidget> {
   @override
   void initState() {
     super.initState();
-    chessboard = Chessboard()..init();
+    this.chessboard = widget.chessboard;
+    chessboard.init();
     chessboard.notify = () {
       setState(() {});
     };
-    chessboard.play();
   }
 
   @override
@@ -121,7 +244,7 @@ class _LimitlessGridWidgetState extends State<LimitlessGridWidget> {
       height: 360,
       decoration: _CustomDecoration(chessboard, offset),
       child: GestureDetector(
-        onTapDown: (e) {
+        onTapUp: (e) {
           Rect rect = context.findRenderObject().paintBounds;
           var point =
               (e.localPosition - rect.center - offset) / chessboard.gridSize;
