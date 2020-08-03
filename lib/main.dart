@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'demo/app_bill.dart';
@@ -16,6 +18,7 @@ import 'demo/running_balls.dart';
 import 'demo/spring_ball.dart';
 import 'demo/todo_drawer.dart';
 import 'demo/xml_parser.dart';
+import 'demo/world_context.dart';
 
 void main() => runApp(MyApp());
 var routes = {
@@ -35,10 +38,28 @@ var routes = {
   "flight_ball": (c) => new FightBallApp(),
   "running_balls": (c) => new RunningBallApp(),
   "conway_life": (c) => new ConwayLifeApp(),
+  "legend": (c) => new LegendApp(),
 };
 
 //全局唯一实例，防止下次进入页面重复创建
 const platform = const MethodChannel('mu.demo');
+
+// 设计图标准尺码
+const Size uxSize = Size(360.0, 0.0);
+final MediaQueryData media = MediaQueryData.fromWindow(window);
+final scaleX = (media.size.width - media.padding.horizontal) / uxSize.width;
+
+extension DoubleFit on double {
+  double get p {
+    return scaleX * this;
+  }
+}
+
+extension IntFit on int {
+  double get p {
+    return scaleX * this;
+  }
+}
 
 class MyApp extends StatelessWidget {
   @override

@@ -4,10 +4,13 @@ import 'dart:io';
 import 'dart:isolate';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'main.dart';
 
 main() {
   print("main#1");
-  test8();
+//  test8();
+  runApp(MaterialApp(home: ConverseApp()));
   print("main#2");
 }
 
@@ -104,7 +107,7 @@ void isolateMain(MapEntry<SendPort, int> entry) {
   mainToIsolatePort.listen((message) {
     print("from main : $message");
   });
-  Future((){
+  Future(() {
     var result = fib(entry.value);
     print("result= $result");
     entry.key.send(result);
@@ -130,4 +133,121 @@ int fib(int n) {
 void test9() async {
   var result = await compute(fib, 20);
   print(result);
+}
+
+class ConverseApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: SafeArea(
+        child: Center(
+          child: RaisedButton(
+            onPressed: () {
+              showDialog(context: context, builder: (c) => ConverseWidget(
+                content: content,
+                name: "弗拉特尔",
+                imageUrl: "images/ic_launcher.png",
+                optionMap: {"查看更多1":(){}, "查看更多2":(){}},
+              ));
+            },
+            child: Text("Converse"),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class ConverseWidget extends StatefulWidget {
+  final String content;
+  final String name;
+  final String imageUrl;
+  final Map<String, Function> optionMap;
+
+  const ConverseWidget({Key key, this.content, this.name, this.imageUrl, this.optionMap}) : super(key: key);
+  @override
+  _ConverseWidgetState createState() => _ConverseWidgetState();
+}
+
+var content = "新生代采用复制清除算法，针对频繁创建销毁的页面控件对象，可以从内内存回收场景，尽量保证UI的流畅性"
+    "新生代采用复制清除算法，针对频繁创建销毁的页面控件对象，可以从内内存回收场景，尽量保证UI的流畅性"
+    "新生代采用复制清除算法，针对频繁创建销毁的页面控件对象，可以从内内存回收场景，尽量保证UI的流畅性"
+    "新生代采用复制清除算法，针对频繁创建销毁的页面控件对象，可以从内内存回收场景，尽量保证UI的流畅性";
+
+class _ConverseWidgetState extends State<ConverseWidget> {
+  @override
+  Widget build(BuildContext context) {
+    Widget buildOption(String name, action()) {
+      return GestureDetector(
+        child: Text(name, style: TextStyle(color: Colors.lightBlue)),
+        onTap: action,
+      );
+    }
+
+    return Center(
+      child: Container(
+        width: 344.p,
+        height: 168.p,
+        child: Material(
+          elevation: 4.0,
+//          color: Colors.transparent,
+          child: Stack(
+            fit: StackFit.expand,
+            children: <Widget>[
+              Positioned(
+                left: 32.p,
+                top: 32.p,
+                child: Container(
+                  height: 96.p,
+                  padding: EdgeInsets.only(left: 8.p, top: 16.p, right: 8.p, bottom: 8.p),
+                  child: SingleChildScrollView(child: Text(content)),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    border: Border.all(color: Colors.lightBlue),
+                  ),
+                ),
+                width: 304.p,
+              ),
+              Positioned(
+                left: 32.p,
+                top: 8.p,
+                child: Center(
+                  child: Container(
+                    width: 280.p,
+                    height: 24.p,
+                    padding: EdgeInsets.only(left: 30.p),
+                    alignment: Alignment.centerLeft,
+                    child: Text(widget.name),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      border: Border.all(color: Colors.lightBlue),
+                    ),
+                  ),
+                ),
+                height: 48.p,
+              ),
+              Positioned(
+                left: 8.p,
+                top: 8.p,
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    border: Border.all(color: Colors.lightBlue),
+                    borderRadius: BorderRadius.circular(24.p),
+                  ),
+                  child: Image.asset("images/ic_launcher.png", width: 48.p, height: 48.p),
+                ),
+              ),
+              Positioned(
+                left: 34.p,
+                top: 136.p,
+                width: 304.p,
+                child: Row(children: widget.optionMap.entries.map((e) => buildOption("查看更多1", () => null)).toList()),
+              )
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }
