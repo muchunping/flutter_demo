@@ -143,12 +143,14 @@ class ConverseApp extends StatelessWidget {
         child: Center(
           child: RaisedButton(
             onPressed: () {
-              showDialog(context: context, builder: (c) => ConverseWidget(
-                content: content,
-                name: "弗拉特尔",
-                imageUrl: "images/ic_launcher.png",
-                optionMap: {"查看更多1":(){}, "查看更多2":(){}},
-              ));
+              showDialog(
+                  context: context,
+                  builder: (c) => ConverseWidget(
+                        content: content,
+                        name: "弗拉特尔",
+                        imageUrl: "images/ic_launcher.png",
+                        optionMap: {"查看更多1": () {}, "查看更多2": () {}},
+                      ));
             },
             child: Text("Converse"),
           ),
@@ -158,6 +160,12 @@ class ConverseApp extends StatelessWidget {
   }
 }
 
+
+var content = "新生代采用复制清除算法，针对频繁创建销毁的页面控件对象，可以从内内存回收场景，尽量保证UI的流畅性"
+    "新生代采用复制清除算法，针对频繁创建销毁的页面控件对象，可以从内内存回收场景，尽量保证UI的流畅性"
+    "新生代采用复制清除算法，针对频繁创建销毁的页面控件对象，可以从内内存回收场景，尽量保证UI的流畅性"
+    "新生代采用复制清除算法，针对频繁创建销毁的页面控件对象，可以从内内存回收场景，尽量保证UI的流畅性";
+
 class ConverseWidget extends StatefulWidget {
   final String content;
   final String name;
@@ -165,23 +173,24 @@ class ConverseWidget extends StatefulWidget {
   final Map<String, Function> optionMap;
 
   const ConverseWidget({Key key, this.content, this.name, this.imageUrl, this.optionMap}) : super(key: key);
+
   @override
   _ConverseWidgetState createState() => _ConverseWidgetState();
 }
 
-var content = "新生代采用复制清除算法，针对频繁创建销毁的页面控件对象，可以从内内存回收场景，尽量保证UI的流畅性"
-    "新生代采用复制清除算法，针对频繁创建销毁的页面控件对象，可以从内内存回收场景，尽量保证UI的流畅性"
-    "新生代采用复制清除算法，针对频繁创建销毁的页面控件对象，可以从内内存回收场景，尽量保证UI的流畅性"
-    "新生代采用复制清除算法，针对频繁创建销毁的页面控件对象，可以从内内存回收场景，尽量保证UI的流畅性";
-
 class _ConverseWidgetState extends State<ConverseWidget> {
   @override
   Widget build(BuildContext context) {
-    Widget buildOption(String name, action()) {
-      return GestureDetector(
-        child: Text(name, style: TextStyle(color: Colors.lightBlue)),
-        onTap: action,
-      );
+    List<Widget> buildOptions(Iterable<MapEntry<String, Function>> entries) {
+      List<Widget> widgets = List();
+      entries.forEach((e) {
+        widgets.add(GestureDetector(
+          child: Text(e.key, style: TextStyle(color: Colors.lightBlue)),
+          onTap: e.value,
+        ));
+        widgets.add(Padding(padding: EdgeInsets.only(left: 8.p)));
+      });
+      return widgets;
     }
 
     return Center(
@@ -192,7 +201,6 @@ class _ConverseWidgetState extends State<ConverseWidget> {
           elevation: 4.0,
 //          color: Colors.transparent,
           child: Stack(
-            fit: StackFit.expand,
             children: <Widget>[
               Positioned(
                 left: 32.p,
@@ -201,10 +209,7 @@ class _ConverseWidgetState extends State<ConverseWidget> {
                   height: 96.p,
                   padding: EdgeInsets.only(left: 8.p, top: 16.p, right: 8.p, bottom: 8.p),
                   child: SingleChildScrollView(child: Text(content)),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    border: Border.all(color: Colors.lightBlue),
-                  ),
+                  decoration: BoxDecoration(color: Colors.white, border: Border.all(color: Colors.lightBlue)),
                 ),
                 width: 304.p,
               ),
@@ -218,10 +223,7 @@ class _ConverseWidgetState extends State<ConverseWidget> {
                     padding: EdgeInsets.only(left: 30.p),
                     alignment: Alignment.centerLeft,
                     child: Text(widget.name),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      border: Border.all(color: Colors.lightBlue),
-                    ),
+                    decoration: BoxDecoration(color: Colors.white, border: Border.all(color: Colors.lightBlue)),
                   ),
                 ),
                 height: 48.p,
@@ -242,7 +244,7 @@ class _ConverseWidgetState extends State<ConverseWidget> {
                 left: 34.p,
                 top: 136.p,
                 width: 304.p,
-                child: Row(children: widget.optionMap.entries.map((e) => buildOption("查看更多1", () => null)).toList()),
+                child: Row(children: buildOptions(widget.optionMap.entries)),
               )
             ],
           ),
